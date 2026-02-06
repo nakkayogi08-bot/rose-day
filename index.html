@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Rose Day Surprise 🌹</title>
+
+<style>
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+    font-family:Arial,Helvetica,sans-serif;
+    overflow:hidden;
+}
+
+/* Card */
+.card{
+    background:white;
+    width:360px;
+    padding:26px;
+    border-radius:22px;
+    text-align:center;
+    box-shadow:0 18px 40px rgba(0,0,0,0.25);
+    animation:popIn 1s ease;
+    position:relative;
+    z-index:2;
+}
+@keyframes popIn{
+    from{transform:scale(0.7);opacity:0}
+    to{transform:scale(1);opacity:1}
+}
+
+/* Buttons */
+.open-btn{
+    background:#ff4d6d;
+    color:white;
+    border:none;
+    padding:14px 26px;
+    border-radius:30px;
+    font-size:16px;
+    cursor:pointer;
+    animation:pulse 1.5s infinite;
+}
+@keyframes pulse{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.08)}
+    100%{transform:scale(1)}
+}
+
+/* Slider */
+.slider{width:100%;margin:15px 0}
+.slider-value{color:#ff4d6d;font-weight:bold}
+
+/* GIF */
+.gif{
+    width:160px;
+    margin:12px auto;
+    display:none;
+}
+
+/* ❤️ HAPPY GIF ANIMATION (RESTORED) */
+.bounce{
+    animation:bounceIn 0.9s ease;
+}
+@keyframes bounceIn{
+    0%{transform:scale(0.3);opacity:0}
+    50%{transform:scale(1.15)}
+    70%{transform:scale(0.95)}
+    100%{transform:scale(1);opacity:1}
+}
+
+/* Rose */
+.rose{
+    font-size:68px;
+    animation:beat 1.6s infinite;
+}
+@keyframes beat{
+    0%{transform:scale(1)}
+    50%{transform:scale(1.25)}
+    100%{transform:scale(1)}
+}
+
+/* Buttons */
+.buttons{
+    margin-top:16px;
+    display:flex;
+    justify-content:center;
+    gap:15px;
+}
+.choice{
+    border:none;
+    padding:10px 22px;
+    border-radius:20px;
+    font-size:15px;
+    color:white;
+    cursor:pointer;
+}
+.yes{background:#ff4d6d}
+.no{
+    background:#555;
+    position:absolute;
+    bottom:25px;
+    right:25px;
+}
+
+/* Growing surprise */
+.grow{
+    animation:growBtn 3s ease forwards;
+}
+@keyframes growBtn{
+    from{transform:scale(0.6)}
+    to{transform:scale(1.4)}
+}
+
+/* Final photo */
+.final-photo{
+    width:260px;
+    border-radius:20px;
+    box-shadow:0 15px 40px rgba(0,0,0,0.35);
+    animation:popIn 1s ease;
+}
+
+/* Hearts / flowers */
+.heart{
+    position:fixed;
+    bottom:-20px;
+    font-size:22px;
+    animation:float linear forwards;
+    pointer-events:none;
+}
+@keyframes float{
+    to{
+        transform:translateY(-120vh) rotate(360deg);
+        opacity:0;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="card" id="card">
+    <h2>💝 Something made just for you</h2>
+    <p>Just… from my heart.</p>
+    <button class="open-btn" onclick="askLove()">Open gently 💌</button>
+</div>
+
+<script>
+let yesCount = 0;
+let heartTimer;
+
+/* STEP 1 — SLIDER */
+function askLove(){
+    card.innerHTML=`
+        <h2>Be honest 😌</h2>
+        <p>How much do you love me? 💕</p>
+
+        <input type="range" min="0" max="100" value="80"
+               class="slider" id="loveRange"
+               oninput="updateLove()">
+
+        <div class="slider-value" id="loveValue">80% 🥰</div>
+
+        <img src="gifs/sad.gif" id="sliderSadGif" class="gif">
+
+        <button class="open-btn" id="continueBtn"
+                onclick="openRoseDay()">Continue 💖</button>
+    `;
+}
+
+function updateLove(){
+    const v = loveRange.value;
+    if(v == 0){
+        loveValue.innerText="0% 😢 Hey… try again 🥺";
+        sliderSadGif.style.display="block";
+        continueBtn.style.display="none";
+    }else{
+        sliderSadGif.style.display="none";
+        continueBtn.style.display="inline-block";
+        loveValue.innerText=v+"% 😍";
+    }
+}
+
+/* STEP 2 — ROSE DAY */
+function openRoseDay(){
+    card.innerHTML=`
+        <div class="rose">🌹</div>
+        <h2>Happy Rose Day</h2>
+        <p>This rose carries every thought I had of you today 🌹</p>
+
+        <img src="gifs/happy.gif" class="gif" id="happyGif">
+
+        <p id="question">Did this make you smile? 😊</p>
+
+        <div class="buttons">
+            <button class="choice yes" onclick="yesPressed()">Yes 😍</button>
+            <button class="choice no" id="noBtn">No 😜</button>
+        </div>
+    `;
+    noBtn.onmouseover = runNo;
+}
+
+/* YES CLICK — 5 TIMES REQUIRED */
+function yesPressed(){
+    yesCount++;
+
+    question.innerText =
+        `You said YES ${yesCount} time${yesCount>1?"s":""} 💖`;
+
+    /* 🔥 HAPPY GIF BOUNCE EVERY TIME */
+    happyGif.style.display="block";
+    happyGif.classList.remove("bounce");
+    void happyGif.offsetWidth; // force reflow
+    happyGif.classList.add("bounce");
+
+    const burst = yesCount === 5 ? 50 : 20;
+    for(let i=0;i<burst;i++) createHeart();
+
+    if(yesCount === 5){
+        question.innerText =
+            "Okay… you unlocked something special 💝";
+
+        document.body.insertAdjacentHTML("beforeend",`
+            <button class="open-btn grow" id="surpriseBtn"
+                    onclick="finalSurprise()">
+                Surprise 💝
+            </button>
+        `);
+    }
+}
+
+/* FINAL SURPRISE */
+function finalSurprise(){
+    const btn = document.getElementById("surpriseBtn");
+    if(btn) btn.remove();
+
+    card.innerHTML=`
+        <img src="her.png" class="final-photo">
+        <h2 style="color:#ff4d6d">I LOVE YOU MY SWEET HEART❤️</h2>
+        <p>You are my favorite surprise 🤍</p>
+    `;
+
+    heartTimer = setInterval(createHeart,200);
+}
+
+/* NO BUTTON RUN */
+function runNo(){
+    noBtn.style.transform =
+        `translate(${Math.random()*180-90}px,
+                   ${Math.random()*100-50}px)`;
+}
+
+/* HEART / FLOWER */
+function createHeart(){
+    const h=document.createElement("div");
+    h.className="heart";
+    h.innerText=Math.random()>0.5?"💖":"🌸";
+    h.style.left=Math.random()*window.innerWidth+"px";
+    h.style.animationDuration=(Math.random()*3+2)+"s";
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),7000);
+}
+</script>
+
+</body>
+</html>
